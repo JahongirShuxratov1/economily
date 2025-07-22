@@ -35,9 +35,9 @@ public class User extends BaseEntity implements UserDetails {
     )
     private Set<UserRole> role;
 
-/*    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     @ToString.Exclude
-    private List<Code> codes;*/
+    private List<Code> codes;
 
 
     @Override
