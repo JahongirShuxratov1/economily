@@ -32,7 +32,7 @@ public class UserController {
         return this.userService.getMe(user);
     }
 
-    @GetMapping("/attach-to-role")
+    @PostMapping("/attach-to-role")
     @PreAuthorize("hasRole('ADMIN')")
     public ApiResponse attachToRole(@RequestParam Long userId,
                                     @RequestParam Long roleId) {
