@@ -1,6 +1,6 @@
 package org.example.economily.controller;
 
-
+import io.swagger.v3.oas.annotations.Operation;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.example.economily.dto.ApiResponse;
@@ -13,14 +13,24 @@ import org.springframework.web.bind.annotation.*;
 @RequiredArgsConstructor
 @RequestMapping("/api/v1/role")
 public class RoleController {
+
     private final RoleService roleService;
 
+
+    @Operation(
+            summary = "Create a new role",
+            description = "Creates a new role using the provided role data. Only accessible to SUPER_ADMIN users."
+    )
     @PreAuthorize("hasRole('SUPER_ADMIN')")
     @PostMapping("/create")
     public ApiResponse create(@RequestBody @NonNull RoleDto.CreateRole dto) {
         return this.roleService.create(dto);
     }
 
+    @Operation(
+            summary = "Get all roles",
+            description = "Retrieves the list of all roles available in the system."
+    )
     @GetMapping("/list")
     public ApiResponse getAll() {
         return this.roleService.getAll();

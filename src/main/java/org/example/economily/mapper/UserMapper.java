@@ -4,6 +4,7 @@ package org.example.economily.mapper;
 import org.example.economily.dto.UserDto;
 import org.example.economily.dto.auths.RegisterDto;
 import org.example.economily.entity.User;
+import org.example.economily.entity.UserRole;
 import org.example.economily.enums.UserStatus;
 import org.springframework.stereotype.Component;
 
@@ -18,17 +19,11 @@ public class UserMapper {
     public UserDto toDto(User user) {
         if (user == null) return null;
 
-        Set<String> roles = user.getRole() != null
-                ? user.getRole().stream()
-                .map(r -> r.getName().toUpperCase())
-                .collect(Collectors.toSet())
-                : Set.of();
-
         return UserDto.builder()
                 .id(user.getId())
                 .fullName(user.getFullname())
                 .email(user.getEmail())
-                .roles(roles)
+                .roles(user.getRole().stream().map(UserRole::getName).collect(Collectors.toSet()))
                 .status(user.getStatus())
                 .createdAt(user.getCreatedAt())
                 .build();

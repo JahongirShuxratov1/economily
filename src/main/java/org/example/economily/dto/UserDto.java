@@ -9,7 +9,7 @@ import java.util.Set;
 @Getter
 @Setter
 @NoArgsConstructor
-@AllArgsConstructor
+    @AllArgsConstructor
 @Builder
 public class UserDto {
     private Long id;

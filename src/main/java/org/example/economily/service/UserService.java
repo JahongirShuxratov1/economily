@@ -10,21 +10,21 @@ import org.example.economily.mapper.UserMapper;
 import org.example.economily.repository.UserRepository;
 import org.example.economily.repository.UserRoleRepository;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
-import org.springframework.security.provisioning.UserDetailsManager;
 import org.springframework.stereotype.Service;
-
-import java.util.Set;
 
 @Service
 @RequiredArgsConstructor
 public class UserService {
+
     private final UserRepository userRepository;
     private final UserRoleRepository roleRepository;
     private final UserMapper userMapper;
 
+    /**
+     * Returns paginated list of users
+     */
     public ApiResponse getAll(Pageable pageable) {
         Page<User> userPage = userRepository.findAll(pageable);
 
@@ -37,6 +37,9 @@ public class UserService {
                 .build();
     }
 
+    /**
+     * Returns the current user's profile
+     */
     public ApiResponse getMe(User user) {
         return ApiResponse.builder()
                 .status(HttpStatus.OK)
@@ -45,13 +48,21 @@ public class UserService {
                 .build();
     }
 
+    /**
+     * Assigns a role to a user
+     */
     public ApiResponse attachToRole(Long userId, Long roleId) {
-        User user = this.userRepository.findById(userId)
+        User user = userRepository.findById(userId)
                 .orElseThrow(() -> new ErrorMessageException("User not found", ErrorCodes.NotFound));
-        UserRole role =this.roleRepository.findById(roleId)
-                .orElseThrow(() -> new ErrorMessageException("User not found", ErrorCodes.NotFound));
-        user.getRole().add(role);
-        userRepository.save(user);
+
+        UserRole role = roleRepository.findById(roleId)
+                .orElseThrow(() -> new ErrorMessageException("Role not found", ErrorCodes.NotFound));
+
+        if (!user.getRole().contains(role)) {
+            user.getRole().add(role);
+            userRepository.save(user);
+        }
+
         return ApiResponse.builder()
                 .status(HttpStatus.OK)
                 .message("Foydalanuvchi roli o'zgartirildi")

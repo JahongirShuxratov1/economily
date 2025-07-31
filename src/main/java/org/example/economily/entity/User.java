@@ -22,10 +22,14 @@ import java.util.Set;
 public class User extends BaseEntity implements UserDetails {
     @Column(unique = true)
     private String email;
+
     private String fullname;
+
     @Enumerated(EnumType.STRING)
     private UserStatus status;
+
     private String password;
+
     @ToString.Exclude
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(
@@ -38,6 +42,18 @@ public class User extends BaseEntity implements UserDetails {
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     @ToString.Exclude
     private List<Code> codes;
+
+    @OneToMany(mappedBy = "createdBy", cascade = CascadeType.ALL, orphanRemoval = true)
+    @ToString.Exclude
+    private List<Article> articles;
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    @ToString.Exclude
+    private List<Like> likes;
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    @ToString.Exclude
+    private List<Comment> comments;
 
 
     @Override
