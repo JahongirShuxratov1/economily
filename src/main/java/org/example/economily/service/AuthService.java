@@ -147,7 +147,7 @@ public class AuthService {
 
     public ApiResponse verify(VerifyDto dto) {
         // 1. User mavjudligini tekshirish
-        User user = userRepository.findByEmailPending(dto.getEmail())
+        User user = userRepository.findByEmail(dto.getEmail())
                 .orElseThrow(() -> new ErrorMessageException("Foydalanuvchi topilmadi", ErrorCodes.NotFound));
 
         // 2. Email va code orqali Code obyektini olish
