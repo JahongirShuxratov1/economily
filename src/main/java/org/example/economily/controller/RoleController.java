@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/v1/role")
+@Tag(name = "Role", description = "Endpoints for managing user roles")
 public class RoleController {
 
     private final RoleService roleService;
