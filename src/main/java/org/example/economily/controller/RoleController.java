@@ -1,6 +1,7 @@
 package org.example.economily.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.example.economily.dto.ApiResponse;
