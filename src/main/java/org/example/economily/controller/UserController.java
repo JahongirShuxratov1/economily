@@ -54,21 +54,32 @@ public class UserController {
     ) {
         return this.userService.attachToRole(userId, roleId);
     }
-
+    
     @PreAuthorize("hasAnyRole('ADMIN','SUPER_ADMIN')")
     @PutMapping("/ban")
+    @Operation(
+            summary = "Ban a user",
+            description = "Bans the user with the given ID. Only accessible to users with ADMIN or SUPER_ADMIN role."
+    )
     public ApiResponse ban(
-            @Parameter(description = "ID of the user to ban") @RequestParam Long userId
+            @Parameter(description = "ID of the user to ban", required = true)
+            @RequestParam Long userId
     ) {
         return this.userService.ban(userId);
     }
 
     @PreAuthorize("hasAnyRole('ADMIN','SUPER_ADMIN')")
     @PutMapping("/unban")
+    @Operation(
+            summary = "Unban a user",
+            description = "Unbans the user with the given ID. Only accessible to users with ADMIN or SUPER_ADMIN role."
+    )
     public ApiResponse unban(
-            @Parameter(description = "ID of the user to unban") @RequestParam Long userId
+            @Parameter(description = "ID of the user to unban", required = true)
+            @RequestParam Long userId
     ) {
         return this.userService.unban(userId);
     }
+
 
 }
