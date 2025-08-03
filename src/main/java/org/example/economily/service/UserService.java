@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.example.economily.dto.ApiResponse;
 import org.example.economily.entity.User;
 import org.example.economily.entity.UserRole;
+import org.example.economily.enums.UserStatus;
 import org.example.economily.exceptions.ErrorCodes;
 import org.example.economily.exceptions.ErrorMessageException;
 import org.example.economily.mapper.UserMapper;
@@ -30,7 +31,7 @@ public class UserService {
 
         return ApiResponse.builder()
                 .status(HttpStatus.OK)
-                .message("Foydalanuvchilar ro‘yxati")
+                .message("List of users")
                 .data(userMapper.dtoList(userPage.getContent()))
                 .elements(userPage.getTotalElements())
                 .pages(userPage.getTotalPages())
@@ -43,7 +44,7 @@ public class UserService {
     public ApiResponse getMe(User user) {
         return ApiResponse.builder()
                 .status(HttpStatus.OK)
-                .message("Foydalanuvchi qabul qilindi")
+                .message("Users retrieved")
                 .data(userMapper.toDto(user))
                 .build();
     }
@@ -65,7 +66,35 @@ public class UserService {
 
         return ApiResponse.builder()
                 .status(HttpStatus.OK)
-                .message("Foydalanuvchi roli o'zgartirildi")
+                .message("Role changed")
+                .build();
+    }
+
+    public ApiResponse ban(Long userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new ErrorMessageException("User not found", ErrorCodes.NotFound));
+
+        user.setStatus(UserStatus.INACTIVE);
+
+        userRepository.save(user);
+
+        return ApiResponse.builder()
+                .status(HttpStatus.OK)
+                .message("User banned")
+                .build();
+    }
+
+    public ApiResponse unban(Long userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new ErrorMessageException("User not found", ErrorCodes.NotFound));
+
+        user.setStatus(UserStatus.ACTIVE);
+
+        userRepository.save(user);
+
+        return ApiResponse.builder()
+                .status(HttpStatus.OK)
+                .message("User activated")
                 .build();
     }
 }

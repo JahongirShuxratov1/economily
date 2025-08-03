@@ -46,13 +46,29 @@ public class UserController {
             summary = "Attach a user to a specific role (ADMIN only)",
             description = "Allows an administrator to assign a specific role to a user by their IDs. This action is restricted to ADMIN users only."
     )
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasAnyRole('ADMIN','SUPER_ADMIN')")
     @PostMapping("/attach-to-role")
     public ApiResponse attachToRole(
             @Parameter(description = "ID of the user to attach") @RequestParam Long userId,
             @Parameter(description = "ID of the role to attach to the user") @RequestParam Long roleId
     ) {
         return this.userService.attachToRole(userId, roleId);
+    }
+
+    @PreAuthorize("hasAnyRole('ADMIN','SUPER_ADMIN')")
+    @PutMapping("/ban")
+    public ApiResponse ban(
+            @Parameter(description = "ID of the user to ban") @RequestParam Long userId
+    ) {
+        return this.userService.ban(userId);
+    }
+
+    @PreAuthorize("hasAnyRole('ADMIN','SUPER_ADMIN')")
+    @PutMapping("/unban")
+    public ApiResponse unban(
+            @Parameter(description = "ID of the user to unban") @RequestParam Long userId
+    ) {
+        return this.userService.unban(userId);
     }
 
 }
