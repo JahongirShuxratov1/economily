@@ -43,31 +43,18 @@ public class AuthService {
     public ApiResponse loginByEmail(LoginDto dto) {
         if (dto.getEmail() == null || dto.getEmail().isBlank() ||
                 dto.getPassword() == null || dto.getPassword().isBlank()) {
-            return ApiResponse.builder()
-                    .status(HttpStatus.BAD_REQUEST)
-                    .message("Email or password is missing")
-                    .build();
+            throw new ErrorMessageException("Email or password is missing", ErrorCodes.BadRequest);
         }
 
-        Optional<User> optionalUser = userRepository.findByEmail(dto.getEmail());
-        if (optionalUser.isEmpty()) {
-            return ApiResponse.builder()
-                    .status(HttpStatus.BAD_REQUEST)
-                    .message("Incorrect email or password")
-                    .build();
-        }
-
-        User user = optionalUser.get();
+        User user = userRepository.findByEmail(dto.getEmail())
+                .orElseThrow(() -> new ErrorMessageException("Incorrect email or password", ErrorCodes.BadRequest));
 
         try {
             UsernamePasswordAuthenticationToken authentication =
                     new UsernamePasswordAuthenticationToken(user.getUsername(), dto.getPassword());
             authenticationManager.authenticate(authentication);
         } catch (Exception e) {
-            return ApiResponse.builder()
-                    .status(HttpStatus.BAD_REQUEST)
-                    .message("Incorrect email or password")
-                    .build();
+            throw new ErrorMessageException("Incorrect email or password", ErrorCodes.BadRequest);
         }
 
         String jwtToken = jwtUtil.generateToken(user.getUsername());
@@ -87,27 +74,18 @@ public class AuthService {
                 userRepository.delete(exist);
                 userRepository.flush();
             } else {
-                return ApiResponse.builder()
-                        .status(HttpStatus.BAD_REQUEST)
-                        .message("User already exists with this email")
-                        .build();
+                throw new ErrorMessageException("User already exists with this email", ErrorCodes.BadRequest);
             }
         }
 
         if (!utils.checkEmail(dto.getEmail())) {
-            return ApiResponse.builder()
-                    .status(HttpStatus.BAD_REQUEST)
-                    .message("Invalid email format")
-                    .build();
+            throw new ErrorMessageException("Invalid email format", ErrorCodes.BadRequest);
         }
 
         String code = utils.getCode();
         boolean sent = utils.sendCodeToMail(dto.getEmail(), code);
         if (!sent) {
-            return ApiResponse.builder()
-                    .status(HttpStatus.BAD_REQUEST)
-                    .message("Failed to send verification code")
-                    .build();
+            throw new ErrorMessageException("Failed to send verification code", ErrorCodes.InternalServerError);
         }
 
         User user = new User();
@@ -135,24 +113,18 @@ public class AuthService {
     }
 
     public ApiResponse verify(VerifyDto dto) {
+        if (dto.getEmail() == null || dto.getEmail().isBlank()) {
+            throw new ErrorMessageException("Email is missing", ErrorCodes.BadRequest);
+        }
+
         User user = userRepository.findByEmail(dto.getEmail())
                 .orElseThrow(() -> new ErrorMessageException("User not found", ErrorCodes.NotFound));
 
         Code code = codeRepository.findByUserId(user.getId())
                 .orElseThrow(() -> new ErrorMessageException("Code not found", ErrorCodes.NotFound));
 
-        if (dto.getEmail() == null || dto.getEmail().isBlank()) {
-            return ApiResponse.builder()
-                    .status(HttpStatus.BAD_REQUEST)
-                    .message("Email is missing")
-                    .build();
-        }
-
         if (!code.getCode().equals(dto.getCode())) {
-            return ApiResponse.builder()
-                    .status(HttpStatus.BAD_REQUEST)
-                    .message("Invalid code")
-                    .build();
+            throw new ErrorMessageException("Invalid code", ErrorCodes.BadRequest);
         }
 
         user.setStatus(UserStatus.ACTIVE);
@@ -178,10 +150,7 @@ public class AuthService {
         String code = utils.getCode();
         boolean sent = utils.sendCodeToMail(dto.getEmail(), code);
         if (!sent) {
-            return ApiResponse.builder()
-                    .status(HttpStatus.BAD_REQUEST)
-                    .message("Failed to send verification code")
-                    .build();
+            throw new ErrorMessageException("Failed to send verification code", ErrorCodes.InternalServerError);
         }
 
         Code codeEntity = new Code();
@@ -197,24 +166,18 @@ public class AuthService {
     }
 
     public ApiResponse checkPassword(CheckForgetPasswordDto dto) {
+        if (dto.getEmail() == null || dto.getEmail().isBlank()) {
+            throw new ErrorMessageException("Email is missing", ErrorCodes.BadRequest);
+        }
+
         User user = userRepository.findByEmail(dto.getEmail())
                 .orElseThrow(() -> new ErrorMessageException("User not found", ErrorCodes.NotFound));
 
         Code code = codeRepository.findByUserId(user.getId())
                 .orElseThrow(() -> new ErrorMessageException("Code not found", ErrorCodes.NotFound));
 
-        if (dto.getEmail() == null || dto.getEmail().isBlank()) {
-            return ApiResponse.builder()
-                    .status(HttpStatus.BAD_REQUEST)
-                    .message("Email is missing")
-                    .build();
-        }
-
         if (!code.getCode().equals(dto.getCode())) {
-            return ApiResponse.builder()
-                    .status(HttpStatus.BAD_REQUEST)
-                    .message("Invalid verification code")
-                    .build();
+            throw new ErrorMessageException("Invalid verification code", ErrorCodes.BadRequest);
         }
 
         user.setPassword(passwordEncoder.encode(dto.getNewPassword()));
@@ -237,10 +200,7 @@ public class AuthService {
             String fullName = firebaseToken.getName();
 
             if (!utils.checkEmail(email)) {
-                return ApiResponse.builder()
-                        .status(HttpStatus.BAD_REQUEST)
-                        .message("Invalid email format")
-                        .build();
+                throw new ErrorMessageException("Invalid email format", ErrorCodes.BadRequest);
             }
 
             User user = userRepository.findByEmail(email).orElse(null);
@@ -270,15 +230,9 @@ public class AuthService {
                     .build();
 
         } catch (FirebaseAuthException e) {
-            return ApiResponse.builder()
-                    .status(HttpStatus.UNAUTHORIZED)
-                    .message("Invalid or expired Google token: " + e.getMessage())
-                    .build();
+            throw new ErrorMessageException("Invalid or expired Google token: " + e.getMessage(), ErrorCodes.Unauthorized);
         } catch (Exception e) {
-            return ApiResponse.builder()
-                    .status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .message("An error occurred: " + e.getMessage())
-                    .build();
+            throw new ErrorMessageException("An error occurred: " + e.getMessage(), ErrorCodes.InternalServerError);
         }
     }
 }
