@@ -46,7 +46,7 @@ public class ArticleService {
     }
 
     public ApiResponse getAll(Topic topic, Pageable pageable) {
-        Page<Article> articlePage = this.articleRepository.findAll(topic.name(), pageable);
+        Page<Article> articlePage = this.articleRepository.findAll(topic != null?topic.name():null, pageable);
 
         return ApiResponse.builder()
                 .status(HttpStatus.OK)
