@@ -107,4 +107,9 @@ public class User extends BaseEntity implements UserDetails {
         return role != null && role.stream()
                 .anyMatch(r -> "SUPER_ADMIN".equalsIgnoreCase(r.getName()));
     }
+
+    public boolean isAdmin() {
+        return role != null && role.stream()
+                .anyMatch(r -> "SUPER_ADMIN".equalsIgnoreCase(r.getName()));
+    }
 }
