@@ -14,7 +14,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @Builder
 @Entity
-@Table(name = "like")
+@Table(name = "article_like")
 public class Like extends BaseEntity{
     @ManyToOne
     @JoinColumn(name = "article_id")
