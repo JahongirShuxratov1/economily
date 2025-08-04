@@ -75,7 +75,9 @@ public class ArticleService {
         Article article = articleRepository.findById(id)
                 .orElseThrow(() -> new ErrorMessageException("Article not found", ErrorCodes.NotFound));
 
-        articleRepository.delete(article);
+        article.setVisibility(false);
+
+        articleRepository.save(article);
 
         return ApiResponse.builder()
                 .status(HttpStatus.OK)
