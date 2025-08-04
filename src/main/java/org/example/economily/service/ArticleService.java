@@ -35,7 +35,7 @@ public class ArticleService {
     }
 
     public ApiResponse getById(Long id) {
-        Article article = articleRepository.findById(id)
+        Article article = articleRepository.findByIdAndVisibilityTrue(id)
                 .orElseThrow(() -> new ErrorMessageException("Article not found", ErrorCodes.NotFound));
 
         return ApiResponse.builder()
@@ -58,7 +58,7 @@ public class ArticleService {
     }
 
     public ApiResponse update(Long id, ArticleDto.CreateArticle dto) {
-        Article article = articleRepository.findById(id)
+        Article article = articleRepository.findByIdAndVisibilityTrue(id)
                 .orElseThrow(() -> new ErrorMessageException("Article not found", ErrorCodes.NotFound));
 
         articleMapper.updateEntity(article, dto);
